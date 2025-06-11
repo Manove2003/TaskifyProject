@@ -10,8 +10,10 @@ const taskRoutes = require("./routes/taskRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const app = express();
 
-// middleware to handle cors
+// Connect database
+connectDB();
 
+// Middleware
 app.use(
   cors({
     origin: "*",
@@ -19,22 +21,19 @@ app.use(
     allowedHeaders: ["Content-type", "Authorization"],
   })
 );
-//connted database
-connectDB();
-
-//middleware
 app.use(express.json());
 
-// routes
-
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/reports", reportRoutes);
 
-// Serve uploads folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-// start server
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: "Something went wrong!", error: err.message });
+});
 
 const PORT = process.env.PORT || 5000;
 
